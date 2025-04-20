@@ -27,7 +27,7 @@ RSA — это асимметричный криптографический а�
 
 ```python
 from rsa_cipher import generate_keys, encrypt, decrypt
-
+```
 # Генерация ключей
 public_key, private_key = generate_keys()
 
