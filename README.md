@@ -28,15 +28,15 @@ RSA — это асимметричный криптографический а�
 ```python
 from rsa_cipher import generate_keys, encrypt, decrypt
 ```
-# Генерация ключей
+### Генерация ключей
 public_key, private_key = generate_keys()
 
-# Шифрование
+### Шифрование
 message = "HELLO RSA"
 ciphertext = encrypt(message, public_key)
 print("Encrypted:", ciphertext)
 
-# Дешифрование
+### Дешифрование
 plaintext = decrypt(ciphertext, private_key)
 print("Decrypted:", plaintext)
 
