@@ -53,5 +53,5 @@ print("Decrypted:", plaintext)
 
 ### Структура проекта
 rsa_cipher.py            # Основная реализация алгоритма RSA
-test_rsa_cipher.py       # Юнит-тесты (PyUnit)
+test_rsa_cipher.py       # Юнит-тесты
 README.md                # Инструкция по сборке и использованию

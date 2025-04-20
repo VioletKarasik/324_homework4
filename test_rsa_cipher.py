@@ -82,6 +82,5 @@ class TestRSACipher(unittest.TestCase):
             keys.add(pub)
         self.assertGreater(len(keys), 1)
 
-
 if __name__ == "__main__":
     unittest.main()

@@ -51,6 +51,7 @@ def generate_keys():
     d = modinv(e, phi)
     return ((e, n), (d, n))  # public, private
 
+
 def encrypt(message, pub_key):
     e, n = pub_key
     return [pow(ord(char), e, n) for char in message]
