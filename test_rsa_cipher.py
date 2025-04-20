@@ -13,11 +13,11 @@ class TestRSACipher(unittest.TestCase):
         decrypted = decrypt(encrypted, self.private_key)
         self.assertEqual(decrypted, message)
 
-    def test_encryption_produces_different_output(self):
+    def test_encryption_is_deterministic(self):
         message = "Stay curious"
         encrypted1 = encrypt(message, self.public_key)
         encrypted2 = encrypt(message, self.public_key)
-        self.assertEqual(encrypted1, encrypted2)
+        self.assertEqual(encrypted1, encrypted2)  # Должно быть одинаково
 
     def test_decryption_with_wrong_key(self):
         message = "SecretMessage42"
@@ -36,7 +36,7 @@ class TestRSACipher(unittest.TestCase):
             self.assertNotEqual(ord(ch), encrypted[i])
 
     def test_large(self):
-            msg = "DataBlock-" * 50  # 500+ characters
+            msg = "DataBlock-" * 50  # 500+ символов
             encrypted = encrypt(msg, self.public_key)
             decrypted = decrypt(encrypted, self.private_key)
             self.assertEqual(decrypted, msg)
@@ -70,7 +70,7 @@ class TestRSACipher(unittest.TestCase):
         self.assertEqual(decrypted, msg)
 
     def test_unicode(self):
-        msg = "你好，世界"  # Chinese for "Hello, World"
+        msg = "你好，世界"  # "Hello, World" на китайском
         encrypted = encrypt(msg, self.public_key)
         decrypted = decrypt(encrypted, self.private_key)
         self.assertEqual(decrypted, msg)

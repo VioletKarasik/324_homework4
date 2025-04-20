@@ -1,70 +1,63 @@
 import random
 from math import gcd
 
-def is_prime(n):
-    if n <= 1:
-        return False
-    if n <= 3:
-        return True
-    if n % 2 == 0 or n % 3 == 0:
-        return False
-    i = 5
-    while i * i <= n:
-        if n % i == 0 or n % (i + 2) == 0:
-            return False
-        i += 6
-    return True
+def generate_primes(limit=10**6):
+    """Генерация списка простых чисел до limit (решето Эратосфена)"""
+    sieve = [True] * (limit + 1)
+    sieve[0:2] = [False, False]
+    for i in range(2, int(limit**0.5) + 1):
+        if sieve[i]:
+            sieve[i*i::i] = [False] * len(sieve[i*i::i])
+    return [i for i, is_prime in enumerate(sieve) if is_prime]
 
-def get_prime_list(limit=10**6):
-    primes = []
-    sieve = [True] * (limit+1)
-    sieve[0] = sieve[1] = False
-    for p in range(2, limit+1):
-        if sieve[p]:
-            primes.append(p)
-            for multiple in range(p*p, limit+1, p):
-                sieve[multiple] = False
-    return primes
+# Глобальный список простых чисел
+PRIMES = generate_primes()
 
 def modinv(a, m):
-    # Extended Euclidean Algorithm
-    m0, x0, x1 = m, 0, 1
-    while a > 1:
-        q = a // m
-        a, m = m, a % m
-        x0, x1 = x1 - q * x0, x0
-    return x1 + m0 if x1 < 0 else x1
+    """Модулярная инверсия через расширенный алгоритм Евклида"""
+    g, x, y = extended_gcd(a, m)
+    if g != 1:
+        raise ValueError('Обратный элемент не существует')
+    return x % m
+
+def extended_gcd(a, b):
+    """Расширенный алгоритм Евклида"""
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = extended_gcd(b % a, a)
+        return (g, x - (b // a) * y, y)
 
 def generate_keys():
-    primes = get_prime_list()
-    p = random.choice(primes)
-    q = random.choice(primes)
+    """Генерация ключевой пары RSA"""
+    p = random.choice(PRIMES)
+    q = random.choice(PRIMES)
     while q == p:
-        q = random.choice(primes)
+        q = random.choice(PRIMES)
 
     n = p * q
     phi = (p - 1) * (q - 1)
+    
+    # Стандартное значение открытой экспоненты
     e = 65537
-    while gcd(e, phi) != 1:
-        e = random.choice(primes)
-
+    if gcd(e, phi) != 1:
+        e = 3  # Fallback для редких случаев
+    
     d = modinv(e, phi)
-    return ((e, n), (d, n))  # public, private
-
+    return ((e, n), (d, n))  # (public, private)
 
 def encrypt(message, pub_key):
+    """Шифрование сообщения"""
     e, n = pub_key
-    return [pow(ord(char), e, n) for char in message]
+    if isinstance(message, str):
+        message = message.encode('utf-8')
+    return [pow(byte, e, n) for byte in message]
 
-def decrypt(ciphertext, private_key):
-    d, n = private_key
-    decrypted_chars = []
-    for char in ciphertext:
-        try:
-            decrypted_char = chr(pow(char, d, n))
-            decrypted_chars.append(decrypted_char)
-        except ValueError:
-            # Символ вне диапазона chr() — это значит дешифровка неверным ключом
-            return "DECRYPTION_FAILED"
-    return ''.join(decrypted_chars)
-
+def decrypt(ciphertext, priv_key):
+    """Дешифрование сообщения"""
+    d, n = priv_key
+    try:
+        decrypted_bytes = bytes([pow(char, d, n) for char in ciphertext])
+        return decrypted_bytes.decode('utf-8')
+    except (UnicodeDecodeError, ValueError, OverflowError):
+        raise ValueError("Decryption failed - invalid key or corrupted data")
